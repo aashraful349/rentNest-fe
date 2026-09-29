@@ -13,6 +13,7 @@ import {
 import Image from "next/image"
 import { Building2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ViewDetailsDialog } from "@/components/shared/propertyDetailsDialog"
 
 const PropertyCard = async () => {
   // 1. Await directly on the server
@@ -22,7 +23,7 @@ const PropertyCard = async () => {
     : properties?.data || properties?.properties || []
 
   const availableProperties = list.filter(
-    (property) => property.availability === "AVAILABLE"
+    (property) => property.availability === "AVAILABLE" && property.feature === true
   )
 
   const hasValidImage = (property: IProperty) => {
@@ -37,7 +38,8 @@ const PropertyCard = async () => {
         <Card key={property.id}>
           <CardHeader>
             <CardTitle>{property.pName}</CardTitle>
-            <CardDescription>{property.availability}</CardDescription>
+            <p>Category: {property.category.type}</p>
+            <CardDescription>Status: {property.availability}</CardDescription>
             {/* <CardAction>Card Action</CardAction> */}
             <p>Location: {property.pLocation}</p>
           </CardHeader>
@@ -60,9 +62,10 @@ const PropertyCard = async () => {
                 </div>
               )}
             </div>
+            <p className="mt-2 font-bold">Price: ${property.pPrice} </p>
           </CardContent>
           <CardFooter>
-            <Button className="w-full">View Details</Button>
+            <ViewDetailsDialog PID={property.id} />
           </CardFooter>
         </Card>
       ))}

@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import PropertyCard from "./_components/HomePropertyCard"
 import { Skeleton } from "@/components/ui/skeleton"
 import { SkeletonCard } from "@/components/shared/skeletonCard"
-import { HomeSkeleton } from "./_components/HomeSkelaton"
+import { HomeSkeleton } from ".././_components/HomeSkelaton"
 
 export default function Page() {
   return (
