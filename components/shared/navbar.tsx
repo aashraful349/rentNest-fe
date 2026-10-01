@@ -107,13 +107,13 @@ export function Navbar() {
                 {/* Auth buttons - desktop */}
                 <div className="hidden gap-2 md:flex">
                   <Link
-                    href="/login"
+                    href="/auth/login"
                     className="inline-flex h-7 items-center justify-center rounded-lg border border-border bg-background px-2.5 text-[0.8rem] font-medium text-foreground transition-colors hover:bg-muted"
                   >
                     Sign In
                   </Link>
                   <Link
-                    href="/signup"
+                    href="/auth/register"
                     className="inline-flex h-7 items-center justify-center rounded-lg bg-primary px-2.5 text-[0.8rem] font-medium text-primary-foreground transition-colors hover:bg-primary/80"
                   >
                     Sign Up
@@ -178,7 +178,7 @@ export function Navbar() {
                       Sign In
                     </Link>
                     <Link
-                      href="/signup"
+                      href="/auth/register"
                       className="inline-flex h-8 w-full items-center justify-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
                     >
                       Sign Up

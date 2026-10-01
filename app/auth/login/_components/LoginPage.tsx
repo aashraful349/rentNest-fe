@@ -1,23 +1,28 @@
 "use client"
 
 import * as React from "react"
-import { useState } from "react"
+import { useActionState, useEffect, useState } from "react"
 import Link from "next/link"
 import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { loginAction } from "../_action/authAction"
+import { toast } from "sonner"
 
 export function LoginPage() {
+  const [state, action, pending] = useActionState(loginAction, false)
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setTimeout(() => setIsLoading(false), 1000)
-  }
+  useEffect(() => {
+    if (!state) return
+    if (state.success) {
+      toast.success(state.message || "Login successful")
+    } else {
+      toast.error(state.message || "Login failed")
+    }
+  }, [state])
 
   return (
     <div className="w-full max-w-md">
@@ -36,7 +41,7 @@ export function LoginPage() {
       </div>
 
       <div className="rounded-2xl border bg-card/95 backdrop-blur-sm p-6 sm:p-8 shadow-xl shadow-black/5 ring-1 ring-border/50">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form action={action} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Email Address
@@ -45,6 +50,7 @@ export function LoginPage() {
               <Mail className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               <Input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="you@example.com"
                 required
@@ -61,6 +67,7 @@ export function LoginPage() {
               <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               <Input
                 id="password"
+                name="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 required
@@ -80,11 +87,11 @@ export function LoginPage() {
           <div className="pt-2">
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={pending}
               className="w-full h-11 gap-2 text-sm font-semibold rounded-lg shadow-sm hover:shadow transition-all"
             >
-              {isLoading ? "Signing in..." : "Sign in to account"}
-              {!isLoading && <ArrowRight className="size-4" />}
+              {pending ? "Signing in..." : "Sign in to account"}
+              {!pending && <ArrowRight className="size-4" />}
             </Button>
           </div>
         </form>

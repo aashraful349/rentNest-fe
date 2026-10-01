@@ -2,6 +2,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google"
 
 import "./globals.css"
 import { cn } from "@/lib/utils"
+import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -26,7 +27,17 @@ export default function RootLayout({
         inter.variable
       )}
     >
-      <body>{children}</body>
+      <body>
+        <Toaster
+          position="top-right"
+          offset={{ top: "72px" }}
+          theme="dark"
+          toastOptions={{
+            className: "bg-neutral-900 text-neutral-50 border-neutral-800 shadow-xl",
+          }}
+        />
+        {children}
+      </body>
     </html>
   )
 }
