@@ -6,14 +6,9 @@ import { GetCategories } from "./_action/GetCategories"
 import { GetAllProperties } from "@/services/GetAllProperties"
 import { PropertyFilterQuery } from "@/lib/type"
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<PropertyFilterQuery>
-}) {
-  const [categories, filters, allProperties] = await Promise.all([
+async function PropertyFiltersSection() {
+  const [categories, allProperties] = await Promise.all([
     GetCategories(),
-    searchParams,
     GetAllProperties(),
   ])
 
@@ -38,6 +33,14 @@ export default async function Page({
     new Set([...propertyLocations, ...(propertyLocations.length === 0 ? defaultLocations : [])])
   ).sort()
 
+  return <PropertyFilters categories={categories} locations={locations} />
+}
+
+export default function PropertyListPage({
+  searchParams,
+}: {
+  searchParams: Promise<PropertyFilterQuery>
+}) {
   return (
     <div className="mx-auto max-w-7xl mt-6 px-4 sm:px-6 lg:px-8">
       <div className="mb-6">
@@ -47,10 +50,12 @@ export default async function Page({
         </p>
       </div>
 
-      <PropertyFilters categories={categories} locations={locations} />
+      <Suspense fallback={<div className="mb-6 h-16 w-full animate-pulse rounded-xl bg-muted" />}>
+        <PropertyFiltersSection />
+      </Suspense>
 
-      <Suspense key={JSON.stringify(filters)} fallback={<HomeSkeleton />}>
-        <PropertyCard filters={filters} />
+      <Suspense fallback={<HomeSkeleton />}>
+        <PropertyCard filters={searchParams} />
       </Suspense>
     </div>
   )

@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { loginAction } from "../_action/authAction"
 import { toast } from "sonner"
 
-export function LoginPage() {
+export function LoginPageComponent() {
   const [state, action, pending] = useActionState(loginAction, false)
   const [showPassword, setShowPassword] = useState(false)
 

@@ -3,7 +3,7 @@ import PropertyDetailsView from "./_components/PropertyDetailsView"
 import { getPropertyDetails } from "@/services/GetPropertyDetails"
 import { DProperty } from "@/lib/type"
 
-export default async function Page({
+export default async function PropertyDetailsPage({
   params,
 }: {
   params: Promise<{ pid: string }>

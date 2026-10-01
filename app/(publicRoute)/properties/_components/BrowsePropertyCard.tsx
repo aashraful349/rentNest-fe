@@ -16,12 +16,12 @@ import { PropertyFilterQuery } from "@/lib/type"
 import Link from "next/link"
 
 type PropertyCardProps = {
-  filters?: PropertyFilterQuery
+  filters?: PropertyFilterQuery | Promise<PropertyFilterQuery>
 }
 
 const PropertyCard = async ({ filters }: PropertyCardProps) => {
-  // Await directly on the server with optional filters
-  const properties = await GetAllProperties(filters)
+  const resolvedFilters = filters ? await filters : undefined
+  const properties = await GetAllProperties(resolvedFilters)
   const list: IProperty[] = (Array.isArray(properties) ? properties : (properties as any)?.data || []) as IProperty[]
 
   const availableProperties = list.filter(
