@@ -22,16 +22,13 @@ export function PropertyFilters({ categories, locations = [] }: PropertyFiltersP
   const [type, setType] = useState(searchParams.get("type") || "ALL")
   const [sort, setSort] = useState(searchParams.get("sort") || "")
 
-  // Recommendations state
   const [showLocationRecommendations, setShowLocationRecommendations] = useState(false)
   const locationContainerRef = useRef<HTMLDivElement>(null)
 
-  // Filter recommendations based on user input
   const filteredLocations = locations.filter((loc) =>
     loc.toLowerCase().includes(location.trim().toLowerCase())
   )
 
-  // Close recommendations on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -97,7 +94,6 @@ export function PropertyFilters({ categories, locations = [] }: PropertyFiltersP
   return (
     <form onSubmit={handleSearch} className="relative z-30 mb-8 rounded-xl border bg-card p-4 shadow-xs">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {/* 1. Location with Recommendations */}
         <div ref={locationContainerRef} className="relative">
           <MapPin className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -114,7 +110,6 @@ export function PropertyFilters({ categories, locations = [] }: PropertyFiltersP
             autoComplete="off"
           />
 
-          {/* Location Recommendations Dropdown */}
           {showLocationRecommendations && locations.length > 0 && (
             <div className="absolute left-0 top-full z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-md border bg-popover p-1 shadow-lg">
               <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
@@ -141,7 +136,6 @@ export function PropertyFilters({ categories, locations = [] }: PropertyFiltersP
           )}
         </div>
 
-        {/* 2. Dynamic Categories from API */}
         <div className="relative">
           <Tag className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <select
@@ -158,7 +152,6 @@ export function PropertyFilters({ categories, locations = [] }: PropertyFiltersP
           </select>
         </div>
 
-        {/* 3. Price */}
         <div className="relative">
           <DollarSign className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -170,7 +163,6 @@ export function PropertyFilters({ categories, locations = [] }: PropertyFiltersP
           />
         </div>
 
-        {/* 4. Sort By Price */}
         <div className="relative">
           <ArrowUpDown className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <select
@@ -184,7 +176,6 @@ export function PropertyFilters({ categories, locations = [] }: PropertyFiltersP
           </select>
         </div>
 
-        {/* 5. Action Buttons */}
         <div className="flex gap-2">
           <Button type="submit" disabled={isPending} className="flex-1 gap-1.5">
             <Search className="size-4" />

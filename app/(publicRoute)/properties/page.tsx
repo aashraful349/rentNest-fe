@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import PropertyCard from "./_components/HomePropertyCard"
+import PropertyCard from "./_components/BrowsePropertyCard"
 import { HomeSkeleton } from "../_components/HomeSkelaton"
 import { PropertyFilters } from "./_components/PropertyFilters"
 import { GetCategories } from "./_action/GetCategories"
@@ -17,7 +17,6 @@ export default async function Page({
     GetAllProperties(),
   ])
 
-  // Extract unique locations from existing properties in the database
   const propertyLocations = (
     Array.isArray(allProperties) ? allProperties : (allProperties as any)?.data || []
   )
@@ -35,7 +34,6 @@ export default async function Page({
     "Badda, Dhaka",
   ]
 
-  // Combine and deduplicate
   const locations: string[] = Array.from(
     new Set([...propertyLocations, ...(propertyLocations.length === 0 ? defaultLocations : [])])
   ).sort()

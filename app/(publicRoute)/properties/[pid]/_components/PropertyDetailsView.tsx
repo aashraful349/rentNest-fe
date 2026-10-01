@@ -102,7 +102,6 @@ export default function PropertyDetailsView({
 
   return (
     <div className="space-y-8">
-      {/* 1. Top Navigation & Action Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <Link
           href="/properties"
@@ -148,7 +147,6 @@ export default function PropertyDetailsView({
         </div>
       </div>
 
-      {/* 2. Title & Metadata Header */}
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2.5">
           <Badge variant="secondary" className="gap-1 px-2.5 py-0.5 text-xs font-semibold">
@@ -197,7 +195,6 @@ export default function PropertyDetailsView({
         </div>
       </div>
 
-      {/* 3. Hero Image Gallery Banner */}
       <div className="relative h-[320px] sm:h-[440px] lg:h-[500px] w-full overflow-hidden rounded-2xl border bg-muted shadow-sm">
         {hasValidImage(property.pImage) ? (
           <Image
@@ -216,11 +213,8 @@ export default function PropertyDetailsView({
         )}
       </div>
 
-      {/* 4. Two-Column Details & Action Grid */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        {/* Left Column (2 spans): Highlights, Description & Details */}
         <div className="space-y-6 lg:col-span-2">
-          {/* Quick Specifications Cards */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-xl border bg-card p-3.5 shadow-xs">
               <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
@@ -264,7 +258,6 @@ export default function PropertyDetailsView({
             </div>
           </div>
 
-          {/* Description Section */}
           <Card className="rounded-xl border shadow-xs">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg font-bold">
@@ -280,7 +273,6 @@ export default function PropertyDetailsView({
             </CardContent>
           </Card>
 
-          {/* Category Overview Card (if description exists) */}
           {property.category?.description && (
             <Card className="rounded-xl border shadow-xs">
               <CardHeader className="pb-3">
@@ -296,7 +288,6 @@ export default function PropertyDetailsView({
             </Card>
           )}
 
-          {/* Amenities & Resident Guarantees */}
           <div className="rounded-xl border bg-muted/30 p-5">
             <h3 className="text-sm font-semibold text-foreground mb-3">
               Why rent through RentNest?
@@ -322,10 +313,8 @@ export default function PropertyDetailsView({
           </div>
         </div>
 
-        {/* Right Column (1 span): Sticky Action Booking Box */}
         <div className="lg:col-span-1">
           <div className="sticky top-24 rounded-2xl border bg-card p-6 shadow-md space-y-6">
-            {/* Price block */}
             <div className="space-y-1">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Rental Price
@@ -340,7 +329,6 @@ export default function PropertyDetailsView({
 
             <Separator />
 
-            {/* Quick Status details */}
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Availability</span>
@@ -371,7 +359,6 @@ export default function PropertyDetailsView({
 
             <Separator />
 
-            {/* Call to Actions */}
             <div className="space-y-2.5">
               {isRequested ? (
                 <div className="rounded-lg border border-emerald-200 bg-emerald-50 dark:bg-emerald-950/40 p-3 text-center text-sm font-medium text-emerald-800 dark:text-emerald-200">

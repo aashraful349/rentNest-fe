@@ -5,7 +5,6 @@ import { Separator } from "@/components/ui/separator"
 export default function Loading() {
   return (
     <div className="mx-auto max-w-7xl mt-6 mb-20 px-4 sm:px-6 lg:px-8 space-y-8 animate-pulse">
-      {/* 1. Top Back & Actions */}
       <div className="flex items-center justify-between">
         <Skeleton className="h-5 w-40 rounded-md" />
         <div className="flex gap-2">
@@ -14,7 +13,6 @@ export default function Loading() {
         </div>
       </div>
 
-      {/* 2. Title & Metadata */}
       <div className="space-y-3">
         <div className="flex gap-2">
           <Skeleton className="h-5 w-24 rounded-full" />
@@ -27,14 +25,10 @@ export default function Loading() {
         </div>
       </div>
 
-      {/* 3. Hero Image Banner Skeleton */}
       <Skeleton className="h-[320px] sm:h-[440px] lg:h-[500px] w-full rounded-2xl" />
 
-      {/* 4. Details & Action Sidebar */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        {/* Left Column (2 spans) */}
         <div className="space-y-6 lg:col-span-2">
-          {/* 4 Quick Stat Cards */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="rounded-xl border bg-card p-3.5 space-y-2">
@@ -44,7 +38,6 @@ export default function Loading() {
             ))}
           </div>
 
-          {/* Description Card */}
           <Card className="rounded-xl">
             <CardHeader className="pb-3">
               <Skeleton className="h-6 w-44" />
@@ -56,7 +49,6 @@ export default function Loading() {
             </CardContent>
           </Card>
 
-          {/* Guarantee Box */}
           <div className="rounded-xl border bg-muted/20 p-5 space-y-3">
             <Skeleton className="h-4 w-48" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -68,7 +60,6 @@ export default function Loading() {
           </div>
         </div>
 
-        {/* Right Column (1 span) - Sidebar */}
         <div className="lg:col-span-1">
           <div className="rounded-2xl border bg-card p-6 shadow-md space-y-6">
             <div className="space-y-2">

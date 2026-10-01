@@ -19,7 +19,6 @@ export const GetAllProperties = async (filters?: PropertyFilterQuery) => {
 
     const res = await fetch(url, { cache: "no-store" })
 
-    // When backend returns 404 on 0 matching properties, return []
     if (res.status === 404) {
       return []
     }
@@ -31,13 +30,11 @@ export const GetAllProperties = async (filters?: PropertyFilterQuery) => {
     const data = await res.json()
     let properties: any[] = data?.data || data || []
 
-    // 1. Sort by price if requested (Low to High / High to Low)
     if (filters?.sort === "price-asc") {
       properties.sort((a, b) => Number(a.pPrice) - Number(b.pPrice))
     } else if (filters?.sort === "price-desc") {
       properties.sort((a, b) => Number(b.pPrice) - Number(a.pPrice))
     } else if (filters?.price && !isNaN(Number(filters.price))) {
-      // 2. Default to proximity if target price was provided
       const target = Number(filters.price)
       properties.sort((a, b) => {
         return Math.abs(Number(a.pPrice) - target) - Math.abs(Number(b.pPrice) - target)

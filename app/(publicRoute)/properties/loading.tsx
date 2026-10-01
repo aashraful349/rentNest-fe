@@ -9,7 +9,6 @@ export default function Loading() {
         <Skeleton className="h-4 w-96 rounded-md" />
       </div>
 
-      {/* Filter Bar Skeleton */}
       <div className="rounded-xl border bg-card p-4 shadow-xs mb-8">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <Skeleton className="h-10 w-full rounded-md" />
