@@ -35,3 +35,10 @@ export interface DProperty{
         updatedAt: string
     }
 }
+
+export type PropertyFilterQuery = {
+  location?: string
+  price?: string
+  type?: string
+  sort?: string
+}
