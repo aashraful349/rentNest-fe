@@ -25,13 +25,13 @@ export const createPropertyAction = async (prevState: any, formData: FormData) =
   const pLocation = formData.get("pLocation") as string
   const pPrice = formData.get("pPrice") as string
   const pDescription = formData.get("pDescription") as string
-  const categoryType = formData.get("categoryType") as string
+  const type = (formData.get("type") || formData.get("categoryType") || "APARTMENT") as string
   const pImage = formData.get("pImage") as string
 
-  if (!pName || !pLocation || !pPrice) {
+  if (!pName || !pLocation || !pPrice || !pDescription) {
     return {
       success: false,
-      message: "Property name, location, and price are required",
+      message: "Property name, location, price, and description are required",
     }
   }
 
@@ -39,20 +39,25 @@ export const createPropertyAction = async (prevState: any, formData: FormData) =
     const cookieStore = await cookies()
     const token = cookieStore.get("accessToken")?.value
 
+    const payload: any = {
+      pName,
+      pLocation,
+      pPrice: String(pPrice),
+      pDescription,
+      type: type.toLowerCase(),
+    }
+
+    if (pImage && pImage.trim()) {
+      payload.pImage = pImage.trim()
+    }
+
     const res = await fetch(`${process.env.BACKEND_API_URL}/api/landlord/properties`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        pName,
-        pLocation,
-        pPrice: Number(pPrice),
-        pDescription: pDescription || "No description provided",
-        categoryType: categoryType || "Apartment",
-        pImage: pImage || "Image not provided",
-      }),
+      body: JSON.stringify(payload),
     })
 
     const result = await res.json()

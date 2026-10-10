@@ -117,7 +117,6 @@ export function Navbar({ user: initialUser }: NavbarProps = {}) {
     { href: "/properties", label: "Browse Properties" },
     { href: getDashboardHref(), label: "Dashboard" },
     { href: "/about", label: "About" },
-    { href: "/contact", label: "Contact" },
   ]
 
   const getRoleBadgeStyle = (role?: string) => {

@@ -23,7 +23,7 @@ export default async function TenantDashboardPage() {
     const rentalsRes = await getTenantRentals()
     if (Array.isArray(rentalsRes)) {
       rentals = rentalsRes
-    } else if (rentalsRes?.data && Array.isArray(rentalsRes.data)) {
+    } else if (Array.isArray(rentalsRes?.data)) {
       rentals = rentalsRes.data
     }
   } catch {}
@@ -32,7 +32,7 @@ export default async function TenantDashboardPage() {
     const paymentsRes = await getTenantPayments()
     if (Array.isArray(paymentsRes)) {
       payments = paymentsRes
-    } else if (paymentsRes?.data && Array.isArray(paymentsRes.data)) {
+    } else if (Array.isArray(paymentsRes?.data)) {
       payments = paymentsRes.data
     }
   } catch {}
@@ -41,7 +41,7 @@ export default async function TenantDashboardPage() {
     const propsRes = await GetAllProperties()
     if (Array.isArray(propsRes)) {
       properties = propsRes
-    } else if (propsRes?.data && Array.isArray(propsRes.data)) {
+    } else if (Array.isArray(propsRes?.data)) {
       properties = propsRes.data
     }
   } catch {}
