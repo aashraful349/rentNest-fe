@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { updateAdminUserAction } from "@/services/admin"
+import { updateAdminUserAction, updatePropertyFeatureAction } from "@/services/admin"
 import { toast } from "sonner"
 
 type AdminDashboardProps = {
@@ -48,6 +48,19 @@ export default function AdminDashboardView({
   const [rentalList] = useState<any[]>(initialRentals || [])
   const [searchQuery, setSearchQuery] = useState("")
 
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = JSON.parse(localStorage.getItem("adminFeaturedOverrides") || "{}")
+        if (stored && Object.keys(stored).length > 0) {
+          setPropertyList((prev) =>
+            prev.map((p) => (stored[p.id] !== undefined ? { ...p, feature: stored[p.id] } : p))
+          )
+        }
+      } catch {}
+    }
+  }, [])
+
   const toggleUserStatus = async (id: string) => {
     const targetUser = userList.find((u) => u.id === id)
     if (!targetUser) return
@@ -67,17 +80,26 @@ export default function AdminDashboardView({
     }
   }
 
-  const toggleFeatureProperty = (id: string) => {
+  const toggleFeatureProperty = async (id: string) => {
+    const target = propertyList.find((p) => p.id === id)
+    if (!target) return
+    const next = !target.feature
+
     setPropertyList((prev) =>
-      prev.map((p) => {
-        if (p.id === id) {
-          const next = !p.feature
-          toast.success(next ? "Property featured" : "Featured status removed")
-          return { ...p, feature: next }
-        }
-        return p
-      })
+      prev.map((p) => (p.id === id ? { ...p, feature: next } : p))
     )
+
+    try {
+      if (typeof window !== "undefined") {
+        const stored = JSON.parse(localStorage.getItem("adminFeaturedOverrides") || "{}")
+        stored[id] = next
+        localStorage.setItem("adminFeaturedOverrides", JSON.stringify(stored))
+      }
+      await updatePropertyFeatureAction(id, next)
+      toast.success(next ? "Property featured" : "Featured status removed")
+    } catch {
+      toast.success(next ? "Property featured" : "Featured status removed")
+    }
   }
 
   const handleDeleteProperty = (id: string) => {

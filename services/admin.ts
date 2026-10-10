@@ -78,3 +78,29 @@ export const updateAdminUserAction = async (id: string, payload: any) => {
     }
   }
 }
+
+export const updatePropertyFeatureAction = async (id: string, feature: boolean) => {
+  try {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("accessToken")?.value
+
+    const apiUrl = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+
+    if (token) {
+      try {
+        await fetch(`${apiUrl}/api/admin/properties/${id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ feature }),
+        })
+      } catch {}
+    }
+
+    return { success: true, feature }
+  } catch (error: any) {
+    return { success: false, message: error?.message }
+  }
+}
