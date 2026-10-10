@@ -99,7 +99,9 @@ export const updateLandlordRequestAction = async (id: string, status: string) =>
     const cookieStore = await cookies()
     const token = cookieStore.get("accessToken")?.value
 
-    const res = await fetch(`${process.env.BACKEND_API_URL}/api/landlord/requests/${id}`, {
+    const apiUrl = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+
+    const res = await fetch(`${apiUrl}/api/landlord/requests/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -112,6 +114,88 @@ export const updateLandlordRequestAction = async (id: string, status: string) =>
     return {
       success: false,
       message: error?.message || "Failed to update request",
+    }
+  }
+}
+
+export const updateLandlordPropertyAction = async (id: string, payload: any) => {
+  try {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("accessToken")?.value
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Authentication required",
+      }
+    }
+
+    const apiUrl = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+
+    const res = await fetch(`${apiUrl}/api/landlord/properties/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+
+    return await res.json()
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Failed to update property",
+    }
+  }
+}
+
+export const updatePropertyAvailabilityAction = async (
+  id: string,
+  availability: "AVAILABLE" | "UNAVAILABLE"
+) => {
+  return updateLandlordPropertyAction(id, { availability })
+}
+
+export const updatePropertyFormAction = async (prevState: any, formData: FormData) => {
+  const id = formData.get("id") as string
+  const pName = formData.get("pName") as string
+  const pLocation = formData.get("pLocation") as string
+  const pPrice = formData.get("pPrice") as string
+  const pDescription = formData.get("pDescription") as string
+  const type = (formData.get("type") || formData.get("categoryType") || "APARTMENT") as string
+  const pImage = formData.get("pImage") as string
+  const availability = (formData.get("availability") || "AVAILABLE") as string
+
+  if (!id) {
+    return {
+      success: false,
+      message: "Property ID is required",
+    }
+  }
+
+  const payload: any = {}
+  if (pName) payload.pName = pName
+  if (pLocation) payload.pLocation = pLocation
+  if (pPrice) payload.pPrice = Number(pPrice)
+  if (pDescription) payload.pDescription = pDescription
+  if (type) payload.type = type.toUpperCase()
+  if (pImage !== undefined) payload.pImage = pImage.trim()
+  if (availability) payload.availability = availability.toUpperCase()
+
+  try {
+    const result = await updateLandlordPropertyAction(id, payload)
+    if (!result?.success) {
+      return result
+    }
+    redirect("/dashboard/landlord")
+  } catch (error: any) {
+    if (error?.message === "NEXT_REDIRECT" || error?.digest?.startsWith("NEXT_REDIRECT")) {
+      throw error
+    }
+    return {
+      success: false,
+      message: error?.message || "Failed to update property",
     }
   }
 }

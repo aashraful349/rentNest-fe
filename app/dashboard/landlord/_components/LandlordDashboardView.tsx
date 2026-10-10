@@ -11,6 +11,7 @@ import {
   TrendingUp,
   MapPin,
   Eye,
+  Pencil,
   KeyRound,
   ShieldCheck,
 } from "lucide-react"
@@ -18,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
-import { updateLandlordRequestAction } from "@/services/landlord"
+import { updateLandlordRequestAction, updatePropertyAvailabilityAction } from "@/services/landlord"
 import { toast } from "sonner"
 
 type LandlordDashboardProps = {
@@ -35,17 +36,43 @@ export default function LandlordDashboardView({
   const [landlordProps, setLandlordProps] = useState<any[]>(properties || [])
   const [inquiries, setInquiries] = useState<any[]>(initialRequests || [])
 
-  const toggleAvailability = (id: string) => {
+  const toggleAvailability = async (id: string) => {
+    const target = landlordProps.find((item) => item.id === id)
+    if (!target) return
+
+    const currentAvailability = target.availability === "AVAILABLE" ? "AVAILABLE" : "UNAVAILABLE"
+    const nextAvailability = currentAvailability === "AVAILABLE" ? "UNAVAILABLE" : "AVAILABLE"
+
     setLandlordProps((prev) =>
-      prev.map((item) => {
-        if (item.id === id) {
-          const next = item.availability === "AVAILABLE" ? "RENTED" : "AVAILABLE"
-          toast.success(`Property marked as ${next}`)
-          return { ...item, availability: next }
-        }
-        return item
-      })
+      prev.map((item) =>
+        item.id === id ? { ...item, availability: nextAvailability } : item
+      )
     )
+
+    try {
+      const res = await updatePropertyAvailabilityAction(id, nextAvailability)
+      if (res?.success) {
+        toast.success(
+          nextAvailability === "AVAILABLE"
+            ? "Property marked as Available"
+            : "Property marked as Unavailable"
+        )
+      } else {
+        toast.error(res?.message || "Failed to update property availability")
+        setLandlordProps((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, availability: currentAvailability } : item
+          )
+        )
+      }
+    } catch {
+      toast.error("Failed to update property availability")
+      setLandlordProps((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, availability: currentAvailability } : item
+        )
+      )
+    }
   }
 
   const handleUpdateStatus = async (id: string, status: "APPROVED" | "REJECTED") => {
@@ -253,6 +280,11 @@ export default function LandlordDashboardView({
                       >
                         {prop.availability === "AVAILABLE" ? "Mark Rented" : "Mark Available"}
                       </Button>
+                      <Link href={`/dashboard/landlord/properties/${prop.id}/edit`}>
+                        <Button size="sm" variant="ghost" className="size-8 p-0" title="Edit Property">
+                          <Pencil className="size-4" />
+                        </Button>
+                      </Link>
                       <Link href={`/properties/${prop.id}`}>
                         <Button size="sm" variant="ghost" className="size-8 p-0" title="View Public Page">
                           <Eye className="size-4" />
