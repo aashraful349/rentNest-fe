@@ -1,9 +1,45 @@
-import React from 'react'
+import React from "react"
+import { getMe } from "@/services/getMe"
+import { getLandlordProperties, getLandlordRequests } from "@/services/landlord"
+import LandlordDashboardView from "./_components/LandlordDashboardView"
 
-const LandlordDashboardPage = () => {
+export const instant = false
+
+export default async function LandlordDashboardPage() {
+  let currentUser = null
+  let properties: any[] = []
+  let requests: any[] = []
+
+  try {
+    const userRes = await getMe()
+    if (userRes?.success && userRes?.data) {
+      currentUser = userRes.data
+    }
+  } catch {}
+
+  try {
+    const propsRes = await getLandlordProperties()
+    if (Array.isArray(propsRes)) {
+      properties = propsRes
+    } else if (propsRes?.data && Array.isArray(propsRes.data)) {
+      properties = propsRes.data
+    }
+  } catch {}
+
+  try {
+    const reqRes = await getLandlordRequests()
+    if (Array.isArray(reqRes)) {
+      requests = reqRes
+    } else if (reqRes?.data && Array.isArray(reqRes.data)) {
+      requests = reqRes.data
+    }
+  } catch {}
+
   return (
-    <div className='mx-auto max-w-7xl mt-3 px-4 sm:px-6 lg:px-8'>Landlord Dashboard</div>
+    <LandlordDashboardView
+      user={currentUser}
+      properties={properties}
+      initialRequests={requests}
+    />
   )
 }
-
-export default LandlordDashboardPage

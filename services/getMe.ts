@@ -12,17 +12,23 @@ export const getMe = async () => {
     }
   }
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-    cache: "force-cache",
-    next: {
-      revalidate: 60 * 60 * 24,
-      tags: ["my-profile"],
-    },
-  })
-  const currentUser = await res.json()
-  return currentUser
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      cache: "force-cache",
+      next: {
+        revalidate: 60 * 60 * 24,
+        tags: ["my-profile"],
+      },
+    })
+    const currentUser = await res.json()
+    return currentUser
+  } catch (error) {
+    return {
+      success: false,
+      message: "Failed to fetch current user",
+    }
+  }
 }
-

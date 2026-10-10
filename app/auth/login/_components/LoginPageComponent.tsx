@@ -99,7 +99,7 @@ export function LoginPageComponent() {
         <div className="mt-6 pt-5 border-t border-border text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link
-            href="/register"
+            href="/auth/register"
             className="font-semibold text-primary underline-offset-4 hover:underline"
           >
             Create one now

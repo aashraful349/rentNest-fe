@@ -15,9 +15,31 @@ export const GetCategories = async (): Promise<ICategory[]> => {
     if (!res.ok) return []
 
     const data = await res.json()
-    return data?.data || data || []
+    const list: ICategory[] = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.data)
+      ? data.data
+      : []
+
+    const seen = new Set<string>()
+    const uniqueList: ICategory[] = []
+
+    for (const item of list) {
+      if (item && item.type) {
+        const key = item.type.trim().toUpperCase()
+        if (!seen.has(key)) {
+          seen.add(key)
+          uniqueList.push({
+            id: item.id,
+            type: item.type.trim(),
+            description: item.description,
+          })
+        }
+      }
+    }
+
+    return uniqueList
   } catch (error) {
-    console.error("Error fetching categories:", error)
     return []
   }
 }

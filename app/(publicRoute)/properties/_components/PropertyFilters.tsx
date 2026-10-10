@@ -22,6 +22,14 @@ export function PropertyFilters({ categories, locations = [] }: PropertyFiltersP
   const [type, setType] = useState(searchParams.get("type") || "ALL")
   const [sort, setSort] = useState(searchParams.get("sort") || "")
 
+  const uniqueCategories = Array.from(
+    new Map(
+      (categories || [])
+        .filter((cat) => cat && cat.type)
+        .map((cat) => [cat.type.trim().toUpperCase(), cat])
+    ).values()
+  )
+
   const [showLocationRecommendations, setShowLocationRecommendations] = useState(false)
   const locationContainerRef = useRef<HTMLDivElement>(null)
 
@@ -58,25 +66,18 @@ export function PropertyFilters({ categories, locations = [] }: PropertyFiltersP
     startTransition(() => {
       const query = params.toString()
       router.push(`${pathname}${query ? `?${query}` : ""}`)
-      router.refresh()
     })
   }
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSelectLocation = (loc: string) => {
+    setLocation(loc)
+    setShowLocationRecommendations(false)
+    applyFilters(loc, price, type, sort)
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setShowLocationRecommendations(false)
     applyFilters(location, price, type, sort)
-  }
-
-  const handleSelectLocation = (selectedLoc: string) => {
-    setLocation(selectedLoc)
-    setShowLocationRecommendations(false)
-    applyFilters(selectedLoc, price, type, sort)
-  }
-
-  const handleSortChange = (newSort: string) => {
-    setSort(newSort)
-    applyFilters(location, price, type, newSort)
   }
 
   const handleReset = () => {
@@ -84,37 +85,35 @@ export function PropertyFilters({ categories, locations = [] }: PropertyFiltersP
     setPrice("")
     setType("ALL")
     setSort("")
-    setShowLocationRecommendations(false)
     startTransition(() => {
       router.push(pathname)
-      router.refresh()
     })
   }
 
+  const handleSortChange = (newSort: string) => {
+    setSort(newSort)
+    applyFilters(location, price, type, newSort)
+  }
+
   return (
-    <form onSubmit={handleSearch} className="relative z-30 mb-8 rounded-xl border bg-card p-4 shadow-xs">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <form onSubmit={handleSubmit} className="mb-8 rounded-xl border bg-card p-4 shadow-xs">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div ref={locationContainerRef} className="relative">
           <MapPin className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search location..."
             value={location}
-            onFocus={() => setShowLocationRecommendations(true)}
-            onClick={() => setShowLocationRecommendations(true)}
             onChange={(e) => {
               setLocation(e.target.value)
               setShowLocationRecommendations(true)
             }}
+            onFocus={() => setShowLocationRecommendations(true)}
             className="w-full rounded-md border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:ring-1 focus:ring-primary"
-            autoComplete="off"
           />
 
-          {showLocationRecommendations && locations.length > 0 && (
-            <div className="absolute left-0 top-full z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-md border bg-popover p-1 shadow-lg">
-              <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
-                Available Locations
-              </div>
+          {showLocationRecommendations && location.trim() && (
+            <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-56 overflow-y-auto rounded-md border bg-popover p-1 shadow-md">
               {filteredLocations.length > 0 ? (
                 filteredLocations.map((loc) => (
                   <button
@@ -144,8 +143,8 @@ export function PropertyFilters({ categories, locations = [] }: PropertyFiltersP
             className="w-full rounded-md border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="ALL">All Categories</option>
-            {categories?.map((cat) => (
-              <option key={cat.id} value={cat.type.toUpperCase()}>
+            {uniqueCategories.map((cat) => (
+              <option key={cat.id || cat.type} value={cat.type.toUpperCase()}>
                 {cat.type}
               </option>
             ))}

@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import PropertyCard from "./_components/BrowsePropertyCard"
 import { HomeSkeleton } from "../_components/HomeSkelaton"
 import { PropertyFilters } from "./_components/PropertyFilters"
-import { GetCategories } from "./_action/GetCategories"
+import { GetCategories, ICategory } from "./_action/GetCategories"
 import { GetAllProperties } from "@/services/GetAllProperties"
 import { PropertyFilterQuery } from "@/lib/type"
 
@@ -12,28 +12,43 @@ async function PropertyFiltersSection() {
     GetAllProperties(),
   ])
 
-  const propertyLocations = (
+  const propertyList = (
     Array.isArray(allProperties) ? allProperties : (allProperties as any)?.data || []
   )
-    .map((p: any) => p.pLocation?.trim())
-    .filter(Boolean) as string[]
 
-  const defaultLocations = [
-    "Gulshan, Dhaka",
-    "Banani, Dhaka",
-    "Dhanmondi, Dhaka",
-    "Uttara, Dhaka",
-    "Mirpur, Dhaka",
-    "Mohammadpur, Dhaka",
-    "Bashundhara R/A, Dhaka",
-    "Badda, Dhaka",
-  ]
+  const availableProperties = propertyList.filter(
+    (p: any) => p.availability === "AVAILABLE"
+  )
+
+  const availableCategoryMap = new Map<string, ICategory>()
+
+  for (const p of availableProperties) {
+    if (p.category?.type) {
+      const typeKey = p.category.type.trim().toUpperCase()
+      if (!availableCategoryMap.has(typeKey)) {
+        const matched = categories.find(
+          (c) => c.type?.trim().toUpperCase() === typeKey
+        )
+        availableCategoryMap.set(typeKey, {
+          id: matched?.id || p.category.id || typeKey,
+          type: matched?.type || p.category.type,
+          description: matched?.description || p.category.description,
+        })
+      }
+    }
+  }
+
+  const availableCategories = Array.from(availableCategoryMap.values())
 
   const locations: string[] = Array.from(
-    new Set([...propertyLocations, ...(propertyLocations.length === 0 ? defaultLocations : [])])
+    new Set(
+      availableProperties
+        .map((p: any) => p.pLocation?.trim())
+        .filter(Boolean) as string[]
+    )
   ).sort()
 
-  return <PropertyFilters categories={categories} locations={locations} />
+  return <PropertyFilters categories={availableCategories} locations={locations} />
 }
 
 export default function PropertyListPage({
