@@ -93,8 +93,8 @@ export const updatePropertyFeatureAction = async (id: string, feature: boolean) 
 
     const apiUrl = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
 
-    const res = await fetch(`${apiUrl}/api/landlord/properties/${id}`, {
-      method: "PUT",
+    const res = await fetch(`${apiUrl}/api/admin/properties/${id}`, {
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
