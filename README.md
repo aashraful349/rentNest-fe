@@ -73,15 +73,6 @@ RentNest connects tenants and landlords with an automated transactional flow:
   └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
-| Step | Phase | Action | Endpoint / Screen | Outcome |
-| :---: | :--- | :--- | :--- | :--- |
-| **1** | **Discovery** | Tenant searches & browses homes | `/properties` | Evaluates property features & pricing |
-| **2** | **Application** | Tenant submits rental request | `POST /api/rentals` | Created with `PENDING` status |
-| **3** | **Approval** | Landlord accepts applicant | `PATCH /api/landlord/requests/:id` | Status changes to `APPROVED` |
-| **4** | **Payment** | Tenant clicks "Pay Now" | `POST /api/payments/create` | Redirected to Stripe Checkout in BDT (৳) |
-| **5** | **Confirmation** | Stripe redirects on success | `/payment/success` | Rental activated & receipt generated |
-| **6** | **Review** | Tenant leaves rating & review | `POST /api/reviews` | Review appears on listing page |
-
 ### Architectural Highlights
 - **Server Actions & Server Components**: Core pages (`/properties`, `/properties/[pid]`, `/dashboard/*`) leverage React Server Components for fast initial data loading and SEO, paired with React 19 Client Components for interactive forms and modals.
 - **Authentication Strategy**: Dual-token architecture using secure HTTP-only cookies (`accessToken` and `refreshToken`). Server actions automatically forward cookies for backend authentication.
