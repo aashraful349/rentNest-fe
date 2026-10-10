@@ -33,17 +33,20 @@ RentNest connects tenants and landlords with an automated transactional flow:
 
 ```mermaid
 flowchart TD
-    Tenant[Tenant / Guest] -->|1. Browses Listings| PublicCatalog[Browse Properties / Catalog]
-    PublicCatalog -->|2. Submits Rental Request| RentalAPI[POST /api/rentals]
-    RentalAPI --> LandlordDash[Landlord Dashboard]
-    LandlordDash -->|3. Approves Request| ApprovedStatus[Status: APPROVED]
-    ApprovedStatus --> TenantDash[Tenant Dashboard]
-    TenantDash -->|4. Clicks Pay Now| StripeAPI[POST /api/payments/create]
-    StripeAPI --> StripeCheckout[Stripe Hosted Checkout in BDT ৳]
-    StripeCheckout -->|5. Redirect on Success| PaymentRouter[/payment?success=true]
-    PaymentRouter --> PaymentSuccess[/payment/success]
-    PaymentSuccess -->|6. Submits Property Review| ReviewAPI[POST /api/reviews]
-    ReviewAPI --> PropertyDetails[Property Details Page]
+    Tenant[Tenant / Guest] -.->|1. Browses Listings| PublicCatalog[Browse Properties / Catalog]
+    PublicCatalog -.->|2. Submits Rental Request| RentalAPI[POST /api/rentals]
+    RentalAPI -.-> LandlordDash[Landlord Dashboard]
+    LandlordDash -.->|3. Approves Request| ApprovedStatus[Status: APPROVED]
+    ApprovedStatus -.-> TenantDash[Tenant Dashboard]
+    TenantDash -.->|4. Clicks Pay Now| StripeAPI[POST /api/payments/create]
+    StripeAPI -.-> StripeCheckout[Stripe Hosted Checkout in BDT ৳]
+    StripeCheckout -.->|5. Redirect on Success| PaymentRouter[Payment Success Handler]
+    PaymentRouter -.-> PaymentSuccess[Payment Success Screen]
+    PaymentSuccess -.->|6. Submits Property Review| ReviewAPI[POST /api/reviews]
+    ReviewAPI -.-> PropertyDetails[Property Details Page]
+
+    classDef dotted stroke-dasharray: 4 4;
+    class Tenant,PublicCatalog,RentalAPI,LandlordDash,ApprovedStatus,TenantDash,StripeAPI,StripeCheckout,PaymentRouter,PaymentSuccess,ReviewAPI,PropertyDetails dotted;
 ```
 
 ### Architectural Highlights
