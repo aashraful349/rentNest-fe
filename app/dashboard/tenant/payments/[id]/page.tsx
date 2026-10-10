@@ -81,7 +81,7 @@ export default async function TenantPaymentDetailsPage({
             Amount Paid
           </span>
           <span className="text-3xl font-extrabold text-foreground">
-            ${payment.amount}
+            ৳{payment.amount}
           </span>
         </div>
       </div>

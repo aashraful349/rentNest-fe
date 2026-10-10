@@ -160,8 +160,8 @@ export default function LandlordDashboardView({
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold">${totalMonthlyRent.toLocaleString()}</span>
-            <span className="text-xs text-muted-foreground">/ month</span>
+            <span className="text-2xl font-extrabold">৳{totalMonthlyRent.toLocaleString()}</span>
+            
           </div>
         </Card>
       </div>
@@ -239,9 +239,9 @@ export default function LandlordDashboardView({
                   <div className="flex items-center justify-between border-t pt-3">
                     <div>
                       <span className="text-lg font-bold text-foreground">
-                        ${prop.pPrice}
+                        ৳{prop.pPrice}
                       </span>
-                      <span className="text-xs text-muted-foreground"> / month</span>
+                      
                     </div>
 
                     <div className="flex items-center gap-1.5">

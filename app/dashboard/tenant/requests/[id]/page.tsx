@@ -50,30 +50,48 @@ export default async function RentalRequestDetailsPage({
     )
   }
 
-  const getStatusBadge = (status: string) => {
-    if (status === "APPROVED" || status === "Approved") {
+  const rawStatus = (request.status || "PENDING").toUpperCase()
+  const isPaid = request.payment?.status === "COMPLETED" || Boolean(request.payment)
+  const isApproved = rawStatus === "APPROVED" && !isPaid
+  const isActive = rawStatus === "ACTIVE" || isPaid
+
+  const getStatusBadge = () => {
+    if (isActive) {
       return (
-        <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-sm px-3 py-1">
-          Approved
+        <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-sm px-3 py-1">
+          ACTIVE
         </Badge>
       )
     }
-    if (status === "REJECTED" || status === "Rejected") {
+    if (rawStatus === "APPROVED") {
       return (
-        <Badge className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20 text-sm px-3 py-1">
-          Rejected
+        <Badge className="bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30 text-sm px-3 py-1">
+          APPROVED
+        </Badge>
+      )
+    }
+    if (rawStatus === "REJECTED") {
+      return (
+        <Badge className="bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30 text-sm px-3 py-1">
+          REJECTED
+        </Badge>
+      )
+    }
+    if (rawStatus === "COMPLETED") {
+      return (
+        <Badge className="bg-muted text-muted-foreground border-border text-sm px-3 py-1">
+          COMPLETED
         </Badge>
       )
     }
     return (
-      <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 text-sm px-3 py-1">
-        Under Review
+      <Badge className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30 text-sm px-3 py-1">
+        PENDING
       </Badge>
     )
   }
 
   const property = request.property
-  const isApproved = request.status === "APPROVED" || request.status === "Approved"
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
@@ -85,7 +103,7 @@ export default async function RentalRequestDetailsPage({
           <ArrowLeft className="size-4" />
           Back to Dashboard
         </Link>
-        {getStatusBadge(request.status)}
+        {getStatusBadge()}
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-6">
@@ -100,9 +118,18 @@ export default async function RentalRequestDetailsPage({
 
         {isApproved && (
           <Link href={`/dashboard/tenant/requests/${request.id}/pay`}>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 shadow-xs">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2 shadow-xs">
               <CreditCard className="size-4" />
-              Pay Rent
+              Pay Now
+            </Button>
+          </Link>
+        )}
+
+        {isActive && (
+          <Link href={`/payment/success?rentalRequestId=${request.id}`}>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 shadow-xs">
+              <MessageSquare className="size-4" />
+              Leave Review
             </Button>
           </Link>
         )}
@@ -176,16 +203,16 @@ export default async function RentalRequestDetailsPage({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Monthly Rent</span>
+                <span className="text-muted-foreground">Rental Price</span>
                 <span className="font-bold text-foreground">
-                  ${property?.pPrice || 0}
+                  ৳{property?.pPrice || 0}
                 </span>
               </div>
 
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Status</span>
                 <span className="font-medium text-foreground">
-                  {request.status}
+                  {rawStatus}
                 </span>
               </div>
 
@@ -210,9 +237,18 @@ export default async function RentalRequestDetailsPage({
 
               {isApproved && (
                 <Link href={`/dashboard/tenant/requests/${request.id}/pay`} className="block w-full">
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2 shadow-xs">
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white gap-2 shadow-xs">
                     <CreditCard className="size-4" />
-                    Proceed to Payment
+                    Pay Now
+                  </Button>
+                </Link>
+              )}
+
+              {isActive && (
+                <Link href={`/payment/success?rentalRequestId=${request.id}`} className="block w-full">
+                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2 shadow-xs">
+                    <MessageSquare className="size-4" />
+                    Leave Review
                   </Button>
                 </Link>
               )}

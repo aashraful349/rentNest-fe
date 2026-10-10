@@ -386,7 +386,7 @@ export default function AdminDashboardView({
                           </div>
                         </td>
                         <td className="px-4 py-3 font-bold text-foreground">
-                          ${req.property?.pPrice || 0}
+                          ৳{req.property?.pPrice || 0}
                         </td>
                         <td className="px-4 py-3">
                           <Badge
@@ -464,7 +464,7 @@ export default function AdminDashboardView({
                         {prop.pLocation}
                       </td>
                       <td className="px-4 py-3 font-bold text-foreground">
-                        ${prop.pPrice}/mo
+                        ৳{prop.pPrice}
                       </td>
                       <td className="px-4 py-3">
                         <Badge

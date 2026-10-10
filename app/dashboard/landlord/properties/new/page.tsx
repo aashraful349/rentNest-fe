@@ -73,7 +73,7 @@ export default function CreatePropertyPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="pPrice">Monthly Rent ($ USD)</Label>
+              <Label htmlFor="pPrice">Rental Price (BDT)</Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
@@ -115,7 +115,7 @@ export default function CreatePropertyPage() {
                 <Input
                   id="pImage"
                   name="pImage"
-                  placeholder="https://example.com/property.jpg"
+                  placeholder="[Optional] https://example.com/property.jpg"
                   className="pl-9"
                 />
               </div>

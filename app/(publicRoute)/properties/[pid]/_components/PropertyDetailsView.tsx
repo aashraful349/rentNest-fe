@@ -295,10 +295,7 @@ export default function PropertyDetailsView({
                 Rent
               </div>
               <p className="mt-1 truncate text-base font-bold text-foreground">
-                ${property.pPrice}
-                <span className="text-xs font-normal text-muted-foreground">
-                  /mo
-                </span>
+                ৳{property.pPrice}
               </p>
             </div>
 
@@ -456,10 +453,10 @@ export default function PropertyDetailsView({
               </span>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl font-extrabold text-foreground">
-                  ${property.pPrice}
+                  ৳{property.pPrice}
                 </span>
                 <span className="text-sm font-medium text-muted-foreground">
-                  / month
+                  
                 </span>
               </div>
             </div>

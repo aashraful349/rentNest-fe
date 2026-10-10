@@ -19,6 +19,7 @@ import {
   Eye,
   Loader2,
   Receipt,
+  MessageSquare,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -90,31 +91,40 @@ export default function TenantDashboardView({
     }
   }
 
-  const getStatusBadge = (status: string, isPaid: boolean) => {
-    if (isPaid) {
+  const getStatusBadge = (rawStatus: string, isPaid: boolean) => {
+    const status = (rawStatus || "").toUpperCase()
+
+    if (status === "ACTIVE" || isPaid) {
       return (
-        <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20">
-          Paid & Approved
+        <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
+          ACTIVE
         </Badge>
       )
     }
-    if (status === "Approved" || status === "APPROVED") {
+    if (status === "APPROVED") {
       return (
-        <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20">
-          {status}
+        <Badge className="bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30">
+          APPROVED
         </Badge>
       )
     }
-    if (status === "Under Review" || status === "PENDING") {
+    if (status === "REJECTED") {
       return (
-        <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20">
-          {status}
+        <Badge className="bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30">
+          REJECTED
+        </Badge>
+      )
+    }
+    if (status === "COMPLETED") {
+      return (
+        <Badge className="bg-muted text-muted-foreground border-border">
+          COMPLETED
         </Badge>
       )
     }
     return (
-      <Badge className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20">
-        {status}
+      <Badge className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30">
+        PENDING
       </Badge>
     )
   }
@@ -170,10 +180,10 @@ export default function TenantDashboardView({
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Approved
             </span>
-            <CheckCircle2 className="size-4 text-emerald-500" />
+            <CheckCircle2 className="size-4 text-blue-500" />
           </div>
           <p className="mt-2 text-2xl font-bold text-foreground">
-            {applications.filter((a) => a.status === "Approved" || a.status === "APPROVED").length}
+            {applications.filter((a) => a.status?.toUpperCase() === "APPROVED").length}
           </p>
           <span className="text-xs text-muted-foreground">
             Ready for payment
@@ -185,7 +195,7 @@ export default function TenantDashboardView({
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Payments
             </span>
-            <CreditCard className="size-4 text-blue-500" />
+            <CreditCard className="size-4 text-emerald-500" />
           </div>
           <p className="mt-2 text-2xl font-bold text-foreground">
             {payments.length}
@@ -274,7 +284,10 @@ export default function TenantDashboardView({
             </div>
           ) : (
             applications.map((app) => {
+              const rawStatus = (app.status || "PENDING").toUpperCase()
               const isPaid = paidRentalRequestIds.has(app.id) || app.payment?.status === "COMPLETED" || Boolean(app.payment)
+              const isActive = rawStatus === "ACTIVE" || isPaid
+              const isApproved = rawStatus === "APPROVED" && !isPaid
 
               return (
                 <Card key={app.id} className="overflow-hidden border p-4 shadow-2xs hover:shadow-xs transition-shadow">
@@ -299,7 +312,7 @@ export default function TenantDashboardView({
                           <h3 className="font-semibold text-foreground text-base">
                             {app.propertyName || app.property?.pName || `Rental Request #${app.id}`}
                           </h3>
-                          {getStatusBadge(app.status, isPaid)}
+                          {getStatusBadge(rawStatus, isPaid)}
                         </div>
                         <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                           {(app.location || app.property?.pLocation) && (
@@ -329,9 +342,9 @@ export default function TenantDashboardView({
                         {(app.price || app.property?.pPrice) && (
                           <div>
                             <span className="text-base font-bold text-foreground">
-                              ${app.price || app.property?.pPrice}
+                              ৳{app.price || app.property?.pPrice}
                             </span>
-                            <span className="text-xs text-muted-foreground"> / month</span>
+                            
                           </div>
                         )}
                         <p className="text-[11px] text-muted-foreground">ID: #{app.id}</p>
@@ -344,17 +357,13 @@ export default function TenantDashboardView({
                             View Details
                           </Button>
                         </Link>
-                        {isPaid ? (
-                          <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 py-1.5 px-3">
-                            <CheckCircle2 className="mr-1 size-3.5 inline" />
-                            Paid
-                          </Badge>
-                        ) : (app.status === "Approved" || app.status === "APPROVED") ? (
+
+                        {isApproved && (
                           <Button
                             size="sm"
                             disabled={payingId === app.id}
                             onClick={() => handleDirectPay(app.id)}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-xs"
+                            className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5 shadow-xs"
                           >
                             {payingId === app.id ? (
                               <>
@@ -364,11 +373,24 @@ export default function TenantDashboardView({
                             ) : (
                               <>
                                 <CreditCard className="size-3.5" />
-                                Pay Rent
+                                Pay Now
                               </>
                             )}
                           </Button>
-                        ) : null}
+                        )}
+
+                        {isActive && (
+                          <Link href={`/payment/success?rentalRequestId=${app.id}`}>
+                            <Button
+                              size="sm"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-xs"
+                            >
+                              <MessageSquare className="size-3.5" />
+                              Leave Review
+                            </Button>
+                          </Link>
+                        )}
+
                         <Button
                           variant="outline"
                           size="sm"
@@ -416,7 +438,7 @@ export default function TenantDashboardView({
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="text-base font-bold text-foreground">
-                      ${p.amount}
+                      ৳{p.amount}
                     </span>
                     <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
                       {p.status || "Paid"}
@@ -466,10 +488,10 @@ export default function TenantDashboardView({
                     {prop.pLocation}
                   </p>
                   <p className="mt-3 text-lg font-bold text-primary">
-                    ${prop.pPrice}
+                    ৳{prop.pPrice}
                     <span className="text-xs font-normal text-muted-foreground">
                       {" "}
-                      / month
+
                     </span>
                   </p>
                 </div>

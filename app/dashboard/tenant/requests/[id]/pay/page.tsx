@@ -131,8 +131,8 @@ export default function TenantPaymentPage({
             </div>
             {rentPrice !== null && (
               <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">Monthly Rent</span>
-                <span className="font-bold text-foreground">${rentPrice.toLocaleString()}</span>
+                <span className="text-muted-foreground">Rental Price</span>
+                <span className="font-bold text-foreground">৳{rentPrice.toLocaleString()}</span>
               </div>
             )}
             <div className="flex justify-between items-center text-sm">

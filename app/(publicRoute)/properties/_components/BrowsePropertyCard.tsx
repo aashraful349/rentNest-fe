@@ -74,7 +74,7 @@ const PropertyCard = async ({ filters }: PropertyCardProps) => {
                 </div>
               )}
             </div>
-            <p className="mt-2 font-bold">Price: ${property.pPrice} </p>
+            <p className="mt-2 font-bold">Price: ৳{property.pPrice} </p>
           </CardContent>
           <CardFooter className="flex justify-between gap-2">
             <Link className="w-full" href={`/properties/${property.id}`}>

@@ -63,7 +63,7 @@ const PropertyCard = async () => {
                 </div>
               )}
             </div>
-            <p className="mt-2 font-bold">Price: ${property.pPrice} </p>
+            <p className="mt-2 font-bold">Price: ৳{property.pPrice} </p>
           </CardContent>
           <CardFooter>
             <Link className="w-full" href={`/properties/${property.id}`}>
