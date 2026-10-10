@@ -3,12 +3,16 @@
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
+const getApiUrl = () => {
+  return (process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(/\/+$/, "")
+}
+
 export const getLandlordProperties = async () => {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get("accessToken")?.value
 
-    const res = await fetch(`${process.env.BACKEND_API_URL}/api/landlord/properties`, {
+    const res = await fetch(`${getApiUrl()}/api/landlord/properties`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -51,7 +55,7 @@ export const createPropertyAction = async (prevState: any, formData: FormData) =
       payload.pImage = pImage.trim()
     }
 
-    const res = await fetch(`${process.env.BACKEND_API_URL}/api/landlord/properties`, {
+    const res = await fetch(`${getApiUrl()}/api/landlord/properties`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -82,7 +86,7 @@ export const getLandlordRequests = async () => {
     const cookieStore = await cookies()
     const token = cookieStore.get("accessToken")?.value
 
-    const res = await fetch(`${process.env.BACKEND_API_URL}/api/landlord/requests`, {
+    const res = await fetch(`${getApiUrl()}/api/landlord/requests`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -99,9 +103,7 @@ export const updateLandlordRequestAction = async (id: string, status: string) =>
     const cookieStore = await cookies()
     const token = cookieStore.get("accessToken")?.value
 
-    const apiUrl = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
-
-    const res = await fetch(`${apiUrl}/api/landlord/requests/${id}`, {
+    const res = await fetch(`${getApiUrl()}/api/landlord/requests/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -130,16 +132,27 @@ export const updateLandlordPropertyAction = async (id: string, payload: any) => 
       }
     }
 
-    const apiUrl = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+    const apiUrl = getApiUrl()
 
-    const res = await fetch(`${apiUrl}/api/landlord/properties/${id}`, {
-      method: "PATCH",
+    let res = await fetch(`${apiUrl}/api/landlord/properties/${id}`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
     })
+
+    if (!res.ok && res.status === 404) {
+      res = await fetch(`${apiUrl}/api/landlord/properties/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      })
+    }
 
     return await res.json()
   } catch (error: any) {

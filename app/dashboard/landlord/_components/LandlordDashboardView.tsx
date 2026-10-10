@@ -12,6 +12,7 @@ import {
   MapPin,
   Eye,
   Pencil,
+  X,
   KeyRound,
   ShieldCheck,
 } from "lucide-react"
@@ -19,7 +20,12 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
-import { updateLandlordRequestAction, updatePropertyAvailabilityAction } from "@/services/landlord"
+import { Input } from "@/components/ui/input"
+import {
+  updateLandlordRequestAction,
+  updatePropertyAvailabilityAction,
+  updateLandlordPropertyAction,
+} from "@/services/landlord"
 import { toast } from "sonner"
 
 type LandlordDashboardProps = {
@@ -35,6 +41,76 @@ export default function LandlordDashboardView({
 }: LandlordDashboardProps) {
   const [landlordProps, setLandlordProps] = useState<any[]>(properties || [])
   const [inquiries, setInquiries] = useState<any[]>(initialRequests || [])
+  const [editingProperty, setEditingProperty] = useState<any | null>(null)
+  const [isSavingEdit, setIsSavingEdit] = useState(false)
+  const [editForm, setEditForm] = useState({
+    pName: "",
+    pLocation: "",
+    pPrice: "",
+    type: "APARTMENT",
+    pImage: "",
+    availability: "AVAILABLE",
+    pDescription: "",
+  })
+
+  const openEditModal = (prop: any) => {
+    setEditingProperty(prop)
+    setEditForm({
+      pName: prop.pName || "",
+      pLocation: prop.pLocation || "",
+      pPrice: String(prop.pPrice || ""),
+      type: (prop.category?.type || prop.type || prop.categoryType || "APARTMENT").toUpperCase(),
+      pImage: prop.pImage === "Image not provided" ? "" : prop.pImage || "",
+      availability: prop.availability === "UNAVAILABLE" ? "UNAVAILABLE" : "AVAILABLE",
+      pDescription: prop.pDescription || "",
+    })
+  }
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingProperty) return
+    setIsSavingEdit(true)
+
+    const payload: any = {
+      pName: editForm.pName,
+      pLocation: editForm.pLocation,
+      pPrice: Number(editForm.pPrice),
+      type: editForm.type.toUpperCase(),
+      availability: editForm.availability,
+      pDescription: editForm.pDescription,
+    }
+    if (editForm.pImage.trim()) {
+      payload.pImage = editForm.pImage.trim()
+    }
+
+    try {
+      const res = await updateLandlordPropertyAction(editingProperty.id, payload)
+      if (res?.success) {
+        toast.success("Property updated successfully!")
+        setLandlordProps((prev) =>
+          prev.map((p) =>
+            p.id === editingProperty.id
+              ? {
+                  ...p,
+                  ...payload,
+                  category: {
+                    ...p.category,
+                    type: payload.type,
+                  },
+                }
+              : p
+          )
+        )
+        setEditingProperty(null)
+      } else {
+        toast.error(res?.message || "Failed to update property")
+      }
+    } catch {
+      toast.error("Failed to update property")
+    } finally {
+      setIsSavingEdit(false)
+    }
+  }
 
   const toggleAvailability = async (id: string) => {
     const target = landlordProps.find((item) => item.id === id)
@@ -278,13 +354,18 @@ export default function LandlordDashboardView({
                         className="text-xs h-8"
                         onClick={() => toggleAvailability(prop.id)}
                       >
-                        {prop.availability === "AVAILABLE" ? "Mark Rented" : "Mark Available"}
+                        {prop.availability === "AVAILABLE" ? "Mark Unavailable" : "Mark Available"}
                       </Button>
-                      <Link href={`/dashboard/landlord/properties/${prop.id}/edit`}>
-                        <Button size="sm" variant="ghost" className="size-8 p-0" title="Edit Property">
-                          <Pencil className="size-4" />
-                        </Button>
-                      </Link>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs h-8 gap-1 font-semibold"
+                        onClick={() => openEditModal(prop)}
+                        title="Edit Property"
+                      >
+                        <Pencil className="size-3.5" />
+                        Edit
+                      </Button>
                       <Link href={`/properties/${prop.id}`}>
                         <Button size="sm" variant="ghost" className="size-8 p-0" title="View Public Page">
                           <Eye className="size-4" />
@@ -366,6 +447,128 @@ export default function LandlordDashboardView({
           </div>
         )}
       </div>
+
+      {editingProperty && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+          <div className="relative w-full max-w-xl rounded-2xl bg-card border shadow-xl p-6 space-y-4 my-8">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <h3 className="text-lg font-bold text-foreground">Edit Property Listing</h3>
+                <p className="text-xs text-muted-foreground">Modify details, price, category, and availability.</p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setEditingProperty(null)}
+                className="size-8 p-0 rounded-full"
+              >
+                <X className="size-4" />
+              </Button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="space-y-4 text-sm">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Property Title</label>
+                <Input
+                  value={editForm.pName}
+                  onChange={(e) => setEditForm({ ...editForm, pName: e.target.value })}
+                  required
+                  placeholder="e.g. Modern Sunset Penthouse"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Location</label>
+                  <Input
+                    value={editForm.pLocation}
+                    onChange={(e) => setEditForm({ ...editForm, pLocation: e.target.value })}
+                    required
+                    placeholder="e.g. Gulshan, Dhaka"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Monthly Price (BDT ৳)</label>
+                  <Input
+                    type="number"
+                    value={editForm.pPrice}
+                    onChange={(e) => setEditForm({ ...editForm, pPrice: e.target.value })}
+                    required
+                    placeholder="e.g. 25000"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Category</label>
+                  <select
+                    value={editForm.type}
+                    onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="APARTMENT">APARTMENT</option>
+                    <option value="HOUSE">HOUSE</option>
+                    <option value="STUDIO">STUDIO</option>
+                    <option value="OFFICE">OFFICE</option>
+                    <option value="SHOP">SHOP</option>
+                    <option value="WAREHOUSE">WAREHOUSE</option>
+                    <option value="LAND">LAND</option>
+                    <option value="OTHER">OTHER</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Availability Status</label>
+                  <select
+                    value={editForm.availability}
+                    onChange={(e) => setEditForm({ ...editForm, availability: e.target.value })}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="AVAILABLE">AVAILABLE (Listed for rent)</option>
+                    <option value="UNAVAILABLE">UNAVAILABLE (Rented / Inactive)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Cover Image URL</label>
+                <Input
+                  value={editForm.pImage}
+                  onChange={(e) => setEditForm({ ...editForm, pImage: e.target.value })}
+                  placeholder="https://example.com/property.jpg"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Description & Amenities</label>
+                <textarea
+                  value={editForm.pDescription}
+                  onChange={(e) => setEditForm({ ...editForm, pDescription: e.target.value })}
+                  rows={4}
+                  required
+                  className="flex w-full rounded-md border border-input bg-background p-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  placeholder="Property description, amenities, rooms..."
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditingProperty(null)}
+                  disabled={isSavingEdit}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isSavingEdit}>
+                  {isSavingEdit ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

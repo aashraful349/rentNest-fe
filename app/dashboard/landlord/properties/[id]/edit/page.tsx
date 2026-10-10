@@ -19,3 +19,4 @@ export default async function EditPropertyPage({
 
   return <EditPropertyForm property={property} />
 }
+
