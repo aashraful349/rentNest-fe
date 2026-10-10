@@ -40,8 +40,8 @@ flowchart TD
     ApprovedStatus --> TenantDash[Tenant Dashboard]
     TenantDash -->|4. Clicks Pay Now| StripeAPI[POST /api/payments/create]
     StripeAPI --> StripeCheckout[Stripe Hosted Checkout in BDT ৳]
-    StripeCheckout -->|5. Redirect on Success| PaymentRouter[/payment?success=true]
-    PaymentRouter --> PaymentSuccess[/payment/success]
+    StripeCheckout -->|5. Redirect on Success| PaymentRouter["/payment?success=true"]
+    PaymentRouter --> PaymentSuccess["/payment/success"]
     PaymentSuccess -->|6. Submits Property Review| ReviewAPI[POST /api/reviews]
     ReviewAPI --> PropertyDetails[Property Details Page]
 ```
