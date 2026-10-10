@@ -31,23 +31,56 @@ It provides an end-to-end ecosystem connecting tenants with verified landlords f
 
 RentNest connects tenants and landlords with an automated transactional flow:
 
-```mermaid
-flowchart TD
-    Tenant[Tenant / Guest] -.->|1. Browses Listings| PublicCatalog[Browse Properties / Catalog]
-    PublicCatalog -.->|2. Submits Rental Request| RentalAPI[POST /api/rentals]
-    RentalAPI -.-> LandlordDash[Landlord Dashboard]
-    LandlordDash -.->|3. Approves Request| ApprovedStatus[Status: APPROVED]
-    ApprovedStatus -.-> TenantDash[Tenant Dashboard]
-    TenantDash -.->|4. Clicks Pay Now| StripeAPI[POST /api/payments/create]
-    StripeAPI -.-> StripeCheckout[Stripe Hosted Checkout in BDT ৳]
-    StripeCheckout -.->|5. Redirect on Success| PaymentRouter[Payment Success Handler]
-    PaymentRouter -.-> PaymentSuccess[Payment Success Screen]
-    PaymentSuccess -.->|6. Submits Property Review| ReviewAPI[POST /api/reviews]
-    ReviewAPI -.-> PropertyDetails[Property Details Page]
-
-    classDef dotted stroke-dasharray: 4 4;
-    class Tenant,PublicCatalog,RentalAPI,LandlordDash,ApprovedStatus,TenantDash,StripeAPI,StripeCheckout,PaymentRouter,PaymentSuccess,ReviewAPI,PropertyDetails dotted;
+```text
+  ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+  ┆  Tenant / Guest   ┆
+  └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+            ┊
+            ┊ 1. Browse listings & filter properties
+            ▼
+  ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+  ┆ Property Catalog  ┆
+  └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+            ┊
+            ┊ 2. Submit rental request (POST /api/rentals)
+            ▼
+  ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+  ┆Landlord Dashboard ┆
+  └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+            ┊
+            ┊ 3. Landlord approves request (Status: APPROVED)
+            ▼
+  ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+  ┆ Tenant Dashboard  ┆
+  └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+            ┊
+            ┊ 4. Clicks "Pay Now" (POST /api/payments/create)
+            ▼
+  ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+  ┆  Stripe Checkout  ┆ ─── Hosted Checkout session in BDT (৳)
+  └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+            ┊
+            ┊ 5. Redirect on successful transaction
+            ▼
+  ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+  ┆  Success Screen   ┆ ─── /payment/success confirmation page
+  └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+            ┊
+            ┊ 6. Submits property review (POST /api/reviews)
+            ▼
+  ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+  ┆ Property Details  ┆ ─── Verified tenant review published live
+  └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
+
+| Step | Phase | Action | Endpoint / Screen | Outcome |
+| :---: | :--- | :--- | :--- | :--- |
+| **1** | **Discovery** | Tenant searches & browses homes | `/properties` | Evaluates property features & pricing |
+| **2** | **Application** | Tenant submits rental request | `POST /api/rentals` | Created with `PENDING` status |
+| **3** | **Approval** | Landlord accepts applicant | `PATCH /api/landlord/requests/:id` | Status changes to `APPROVED` |
+| **4** | **Payment** | Tenant clicks "Pay Now" | `POST /api/payments/create` | Redirected to Stripe Checkout in BDT (৳) |
+| **5** | **Confirmation** | Stripe redirects on success | `/payment/success` | Rental activated & receipt generated |
+| **6** | **Review** | Tenant leaves rating & review | `POST /api/reviews` | Review appears on listing page |
 
 ### Architectural Highlights
 - **Server Actions & Server Components**: Core pages (`/properties`, `/properties/[pid]`, `/dashboard/*`) leverage React Server Components for fast initial data loading and SEO, paired with React 19 Client Components for interactive forms and modals.
