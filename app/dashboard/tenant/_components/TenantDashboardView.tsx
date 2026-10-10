@@ -33,6 +33,7 @@ type TenantDashboardProps = {
   properties: any[]
   initialRentals?: any[]
   initialPayments?: any[]
+  reviewedRentalRequestIds?: string[]
 }
 
 export default function TenantDashboardView({
@@ -40,6 +41,7 @@ export default function TenantDashboardView({
   properties,
   initialRentals,
   initialPayments,
+  reviewedRentalRequestIds = [],
 }: TenantDashboardProps) {
   const [activeTab, setActiveTab] = useState<"applications" | "payments" | "recommended" | "profile">("applications")
   const [applications, setApplications] = useState<any[]>(initialRentals || [])
@@ -91,9 +93,16 @@ export default function TenantDashboardView({
     }
   }
 
-  const getStatusBadge = (rawStatus: string, isPaid: boolean) => {
+  const getStatusBadge = (rawStatus: string, isPaid: boolean, isReviewed: boolean = false) => {
     const status = (rawStatus || "").toUpperCase()
 
+    if (isReviewed || status === "COMPLETED") {
+      return (
+        <Badge className="bg-muted text-muted-foreground border-border">
+          COMPLETED
+        </Badge>
+      )
+    }
     if (status === "ACTIVE" || isPaid) {
       return (
         <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
@@ -112,13 +121,6 @@ export default function TenantDashboardView({
       return (
         <Badge className="bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30">
           REJECTED
-        </Badge>
-      )
-    }
-    if (status === "COMPLETED") {
-      return (
-        <Badge className="bg-muted text-muted-foreground border-border">
-          COMPLETED
         </Badge>
       )
     }
@@ -288,6 +290,7 @@ export default function TenantDashboardView({
               const isPaid = paidRentalRequestIds.has(app.id) || app.payment?.status === "COMPLETED" || Boolean(app.payment)
               const isActive = rawStatus === "ACTIVE" || isPaid
               const isApproved = rawStatus === "APPROVED" && !isPaid
+              const isReviewed = reviewedRentalRequestIds.includes(app.id)
 
               return (
                 <Card key={app.id} className="overflow-hidden border p-4 shadow-2xs hover:shadow-xs transition-shadow">
@@ -312,7 +315,7 @@ export default function TenantDashboardView({
                           <h3 className="font-semibold text-foreground text-base">
                             {app.propertyName || app.property?.pName || `Rental Request #${app.id}`}
                           </h3>
-                          {getStatusBadge(rawStatus, isPaid)}
+                          {getStatusBadge(rawStatus, isPaid, isReviewed)}
                         </div>
                         <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                           {(app.location || app.property?.pLocation) && (
@@ -379,7 +382,7 @@ export default function TenantDashboardView({
                           </Button>
                         )}
 
-                        {isActive && (
+                        {isActive && !isReviewed && (
                           <Link href={`/payment/success?rentalRequestId=${app.id}`}>
                             <Button
                               size="sm"
