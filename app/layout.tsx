@@ -1,4 +1,5 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google"
+import type { Metadata } from "next"
+import { Geist_Mono, Inter } from "next/font/google"
 
 import "./globals.css"
 import { cn } from "@/lib/utils"
@@ -10,6 +11,19 @@ const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 })
+
+export const metadata: Metadata = {
+  title: "RentNest - Modern Rental Property Marketplace",
+  description: "Find your ideal home or list your rental property with ease on RentNest.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/icon-192.png",
+  },
+}
 
 export default function RootLayout({
   children,
