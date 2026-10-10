@@ -53,6 +53,10 @@ export default function TenantPaymentPage({
     setErrorMessage(null)
 
     try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("lastPaymentRentalRequestId", requestId)
+      }
+
       const res = await createPaymentAction(requestId)
 
       if (res?.success && res?.data?.paymentUrl) {

@@ -9,8 +9,11 @@ function PaymentRedirectContent() {
   const success = searchParams.get("success")
 
   useEffect(() => {
+    const savedRequestId = typeof window !== "undefined" ? localStorage.getItem("lastPaymentRentalRequestId") : null
+    const param = savedRequestId ? `?rentalRequestId=${savedRequestId}` : ""
+
     if (success === "true") {
-      router.replace("/payment/success")
+      router.replace(`/payment/success${param}`)
     } else if (success === "false") {
       router.replace("/payment/cancel")
     } else {

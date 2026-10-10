@@ -67,6 +67,10 @@ export default function TenantDashboardView({
   const handleDirectPay = async (rentalRequestId: string) => {
     setPayingId(rentalRequestId)
     try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("lastPaymentRentalRequestId", rentalRequestId)
+      }
+
       const res = await createPaymentAction(rentalRequestId)
       if (res?.success && res?.data?.paymentUrl) {
         toast.success("Redirecting to Stripe checkout...")

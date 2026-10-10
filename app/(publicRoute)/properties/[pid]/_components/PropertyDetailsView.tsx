@@ -24,6 +24,9 @@ import {
   Loader2,
   AlertCircle,
   LogIn,
+  Star,
+  MessageSquare,
+  User,
 } from "lucide-react"
 
 import { DProperty } from "@/lib/type"
@@ -40,19 +43,34 @@ type CurrentUser = {
   name?: string
 } | null
 
+export type PropertyReview = {
+  id: string
+  title: string
+  description: string
+  createdAt?: string
+  tenantId?: string
+  user?: {
+    name?: string
+    email?: string
+  }
+}
+
 type PropertyDetailsViewProps = {
   pid: string
   initialProperty: DProperty | null
   currentUser?: CurrentUser
+  initialReviews?: PropertyReview[]
 }
 
 export default function PropertyDetailsView({
   pid,
   initialProperty,
   currentUser,
+  initialReviews = [],
 }: PropertyDetailsViewProps) {
   const router = useRouter()
   const [property] = useState<DProperty | null>(initialProperty)
+  const [reviews] = useState<PropertyReview[]>(initialReviews)
   const [copied, setCopied] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
   const [isRequested, setIsRequested] = useState(false)
@@ -344,6 +362,58 @@ export default function PropertyDetailsView({
               </CardContent>
             </Card>
           )}
+
+          <Card className="rounded-xl border shadow-xs">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-lg font-bold">
+                  <Star className="size-5 text-amber-500 fill-amber-500" />
+                  Tenant Reviews ({reviews.length})
+                </CardTitle>
+                <span className="text-xs text-muted-foreground">
+                  Verified tenants feedback
+                </span>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {reviews.length === 0 ? (
+                <div className="rounded-xl border border-dashed p-6 text-center text-muted-foreground">
+                  <MessageSquare className="mx-auto size-8 text-muted-foreground/60" />
+                  <p className="mt-2 text-sm font-medium">No reviews yet for this property</p>
+                  <p className="text-xs text-muted-foreground">
+                    Reviews from tenants who have completed rentals will appear here.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((rev) => (
+                    <div
+                      key={rev.id}
+                      className="rounded-xl border bg-muted/20 p-4 space-y-2 hover:bg-muted/30 transition-colors"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="font-semibold text-foreground text-sm">
+                          {rev.title}
+                        </h4>
+                        <span className="text-[11px] text-muted-foreground">
+                          {rev.createdAt ? formatDate(rev.createdAt) : "Recent"}
+                        </span>
+                      </div>
+                      <p className="text-xs leading-relaxed text-muted-foreground whitespace-pre-line">
+                        {rev.description}
+                      </p>
+                      {rev.user?.name && (
+                        <div className="flex items-center gap-1.5 pt-1 text-[11px] text-muted-foreground">
+                          <User className="size-3 text-primary" />
+                          <span>Reviewed by {rev.user.name}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           <div className="rounded-xl border bg-muted/30 p-5">
             <h3 className="mb-3 text-sm font-semibold text-foreground">
