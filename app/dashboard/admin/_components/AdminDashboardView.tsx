@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { updateAdminUserAction } from "@/services/admin"
+import { updateAdminUserAction, updatePropertyFeatureAction } from "@/services/admin"
 import { toast } from "sonner"
 
 type AdminDashboardProps = {
@@ -67,17 +67,25 @@ export default function AdminDashboardView({
     }
   }
 
-  const toggleFeatureProperty = (id: string) => {
+  const toggleFeatureProperty = async (id: string) => {
+    const target = propertyList.find((p) => p.id === id)
+    if (!target) return
+    const next = !target.feature
+
     setPropertyList((prev) =>
-      prev.map((p) => {
-        if (p.id === id) {
-          const next = !p.feature
-          toast.success(next ? "Property featured" : "Featured status removed")
-          return { ...p, feature: next }
-        }
-        return p
-      })
+      prev.map((p) => (p.id === id ? { ...p, feature: next } : p))
     )
+
+    try {
+      const res = await updatePropertyFeatureAction(id, next)
+      if (res?.success) {
+        toast.success(next ? "Property featured" : "Featured status removed")
+      } else {
+        toast.error(res?.message || "Failed to update property feature status")
+      }
+    } catch {
+      toast.error("Failed to update property feature status")
+    }
   }
 
   const handleDeleteProperty = (id: string) => {

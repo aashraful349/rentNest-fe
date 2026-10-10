@@ -84,23 +84,27 @@ export const updatePropertyFeatureAction = async (id: string, feature: boolean) 
     const cookieStore = await cookies()
     const token = cookieStore.get("accessToken")?.value
 
-    const apiUrl = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
-
-    if (token) {
-      try {
-        await fetch(`${apiUrl}/api/admin/properties/${id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ feature }),
-        })
-      } catch {}
+    if (!token) {
+      return {
+        success: false,
+        message: "Authentication required",
+      }
     }
 
-    return { success: true, feature }
+    const apiUrl = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+
+    const res = await fetch(`${apiUrl}/api/landlord/properties/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ feature }),
+    })
+
+    const data = await res.json()
+    return data
   } catch (error: any) {
-    return { success: false, message: error?.message }
+    return { success: false, message: error?.message || "Failed to update property feature status" }
   }
 }
